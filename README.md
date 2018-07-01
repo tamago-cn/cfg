@@ -1,2 +1,2 @@
 # cfg
-an easy config module for golang based go-ini
+an easy config module for golang based on go-ini
