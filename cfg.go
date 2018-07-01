@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-ini/ini"
 
-	// 推荐使用此日志库，扩展性非常好
 	log "github.com/sirupsen/logrus"
 )
 
