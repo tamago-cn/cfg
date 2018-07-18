@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	// 推荐使用此日志库，扩展性非常好
+	// 推荐使用此日志库，扩展性非常好, 在业务模块前引用logger即可实现对此日志库的相关配置
 	//log "github.com/sirupsen/logrus"
 	_ "github.com/tamago-cn/logger"
 
