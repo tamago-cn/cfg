@@ -17,7 +17,7 @@ var conf *Conf
 
 // Conf 模块配置
 type Conf struct {
-	WorkDir string `ini:"work_dir" comment:"工作目录"`
+	WorkDir string `ini:"work_dir" form:"work_dir" comment:"工作目录"`
 }
 
 // Reload 模块初始化入口

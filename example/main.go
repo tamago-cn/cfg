@@ -2,6 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	// 推荐使用此日志库，扩展性非常好, 在业务模块前引用logger即可实现对此日志库的相关配置
 	//log "github.com/sirupsen/logrus"
@@ -24,7 +28,13 @@ func main() {
 	// TODO: Load 或Reload 之后将main线程阻塞，以达到启动服务的效果
 	cfg.Reload(true)
 
+	cfg.Run()
+
 	defer cfg.Destroy()
 
 	cfg.Save()
+
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	fmt.Println("received signal:", <-ch)
 }

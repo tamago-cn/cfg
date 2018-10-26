@@ -1,0 +1,15 @@
+<html>
+<head><title></title></head>
+<body>
+{{ range . }}
+<form action="/cfg/update/{{ .Title }}" method="PUT" target="nm_iframe">
+	<label>{{ .Title }}</label><br>
+	{{ range .Inputs }}
+		{{ .Name }}: <input type="{{ .Type }}" name="{{ .Name }}"><a>{{.Comment}}</a><br>
+	{{ end }}
+	<input type="submit" value="保存修改">
+</form>
+{{ end }}
+<iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+</body>
+</html>
