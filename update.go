@@ -27,15 +27,33 @@ func indexHandler(c *gin.Context) {
 	for _, s := range sections {
 		inputs := []*Input{}
 		cf := cfgMap[s]
-		ct := reflect.TypeOf(cf)
-		cv := reflect.ValueOf(cf)
-		fmt.Println(ct)
-		fmt.Println(cv)
+		switch cs := cf.(type) {
+		default:
+			ct := reflect.TypeOf(cs)
+			cv := reflect.ValueOf(cs)
+			if ct.Kind() == reflect.Ptr {
+				ct = ct.Elem()
+				cv = cv.Elem()
+			} else {
+				c.JSON(http.StatusForbidden, gin.H{
+					"error_msg": "non-pointer struct",
+				})
+				return
+			}
+			fmt.Println(ct)
+			fmt.Println(cv)
 
-		inputs = append(inputs, &Input{
-			Name: "test",
-			Type: "text",
-		})
+			for i := 0; i < ct.NumField(); i++ {
+				f := ct.Field(i)
+				v := cv.Field(i)
+				inputs = append(inputs, &Input{
+					Name:    f.Tag.Get("form"),
+					Type:    f.Type.String(),
+					Value:   v.String(),
+					Comment: f.Tag.Get("comment"),
+				})
+			}
+		}
 		form := &Form{
 			Title:  s,
 			Inputs: inputs,
@@ -51,6 +69,8 @@ type updateReq struct {
 }
 
 func updateHandler(c *gin.Context) {
+	s := c.Param("section")
+	fmt.Println(s)
 	//req := &updateReq{}
 	//err := c.BindJSON(req)
 	//req := map[string]interface{}{}

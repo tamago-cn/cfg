@@ -5,7 +5,7 @@
 <form action="/cfg/update/{{ .Title }}" method="PUT" target="nm_iframe">
 	<label>{{ .Title }}</label><br>
 	{{ range .Inputs }}
-		{{ .Name }}: <input type="{{ .Type }}" name="{{ .Name }}"><a>{{.Comment}}</a><br>
+		{{ .Name }}: <input type="{{ .Type }}" name="{{ .Name }}" value="{{ .Value }}"><a>{{.Comment}}</a><br>
 	{{ end }}
 	<input type="submit" value="保存修改">
 </form>

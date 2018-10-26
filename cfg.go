@@ -38,9 +38,9 @@ var (
 
 // Conf 配置
 type Conf struct {
-	Addr         string        `ini:"addr" json:"addr"`
-	ReadTimeout  time.Duration `ini:"read_timeout" json:"read_timeout"`
-	WriteTimeout time.Duration `ini:"write_timeout" json:"write_timeout"`
+	Addr         string        `ini:"addr" form:"addr" json:"addr"`
+	ReadTimeout  time.Duration `ini:"read_timeout" form:"read_timeout" json:"read_timeout"`
+	WriteTimeout time.Duration `ini:"write_timeout" form:"write_timeout" json:"write_timeout"`
 }
 
 // RegistSection 注册配置节
