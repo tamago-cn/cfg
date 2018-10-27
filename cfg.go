@@ -145,9 +145,9 @@ func Run() error {
 	router := gin.Default()
 
 	if pathExists("static") {
-		router.Static("/cfg/static", "static")
+		router.Static("/static", "static")
 	} else {
-		router.Use(static.Serve("/cfg/static", binaryFileSystem("static")))
+		router.Use(static.Serve("/static", binaryFileSystem("static")))
 	}
 
 	if pathExists("templates") {
