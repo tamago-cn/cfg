@@ -53,19 +53,25 @@ func indexHandler(c *gin.Context) {
 				})
 				return
 			}
-			fmt.Println(ct)
-			fmt.Println(cv)
 
 			for i := 0; i < ct.NumField(); i++ {
 				f := ct.Field(i)
 				v := cv.Field(i)
+				name := f.Tag.Get("form")
+				if name == "" {
+					// 不绑定form的不展示在网页上
+					continue
+				}
 				inputs = append(inputs, &Input{
-					Name:    f.Tag.Get("form"),
+					Name:    name,
 					Type:    getInputType(f),
 					Value:   getValue(v),
 					Comment: f.Tag.Get("comment"),
 				})
 			}
+		}
+		if len(inputs) == 0 {
+			continue
 		}
 		form := &Form{
 			Title:  s,
@@ -83,7 +89,6 @@ func updateHandler(c *gin.Context) {
 		switch x := cf.(type) {
 		default:
 			err := c.BindQuery(x)
-			fmt.Println(err)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error_msg": err.Error(),
