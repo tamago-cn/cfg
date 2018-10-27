@@ -141,7 +141,7 @@ func Destroy() error {
 		}
 		log.Infof("%s destroyed success", fname)
 	}
-	return nil
+	return Stop()
 }
 
 // Run 将配置暴露在网页上使其可修改
