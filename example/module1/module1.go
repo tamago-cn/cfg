@@ -18,8 +18,8 @@ var conf *Conf
 
 // Conf 模块配置
 type Conf struct {
-	Host string `ini:"host" form:"host"`
-	Port int    `ini:"port" form:"port"`
+	Host string `ini:"host" json:"host"`
+	Port int    `ini:"port" json:"port"`
 }
 
 // Reload 模块初始化入口
