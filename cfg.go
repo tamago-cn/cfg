@@ -21,7 +21,9 @@ func init() {
 	dm = make(map[string]func() error)
 
 	conf = &Conf{
-		Addr: "0.0.0.0:8086",
+		Addr:         "0.0.0.0:8086",
+		ReadTimeout:  10,
+		WriteTimeout: 10,
 	}
 	RegistSection("cfg", conf, nil, nil)
 }
@@ -162,6 +164,7 @@ func Run() error {
 
 	router.Use(webCommomHandler())
 
+	router.GET("/", indexHandler)
 	router.GET("/cfg", indexHandler)
 	router.GET("/cfg/index", indexHandler)
 	router.GET("/cfg/list", confListHandler)

@@ -108,38 +108,30 @@ func confListHandler(c *gin.Context) {
 		}
 		confs = append(confs, sec)
 	}
-	c.JSON(http.StatusOK, confs)
+	RenderSuccess(c, confs)
 }
 
 func updateHandler(c *gin.Context) {
 	s := c.Param("section")
-	fmt.Println(s)
 	if cf, ok := cfgMap[s]; ok {
 		switch x := cf.(type) {
 		default:
 			fmt.Println(x)
 			err := c.BindJSON(x)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"error_msg": err.Error(),
-				})
+				RenderErrMsg(c, err.Error())
 				return
 			}
-			fmt.Println(x)
 			err = Save()
 			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"error_msg": err.Error(),
-				})
+				RenderErrMsg(c, err.Error())
 				return
 			}
-			c.JSON(http.StatusOK, gin.H{
+			RenderSuccess(c, gin.H{
 				s: x,
 			})
 			return
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"error_msg": "unsupported section",
-	})
+	RenderErrMsg(c, "unsupported section")
 }
