@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func getInputType(f reflect.StructField) string {
@@ -118,13 +119,27 @@ func updateHandler(c *gin.Context) {
 		default:
 			err := c.BindJSON(x)
 			if err != nil {
+				log.Errorf("updateHandler c.BindJSON error: %s", err.Error())
 				RenderErrMsg(c, err.Error())
 				return
 			}
 			err = Save()
 			if err != nil {
+				log.Errorf("updateHandler save config '%s' error: %s", s, err.Error())
 				RenderErrMsg(c, err.Error())
 				return
+			}
+			log.Infof("updateHandler save config '%s' success", s)
+			reload := rm[s]
+			if reload != nil {
+				err = reload()
+				// 局部重载
+				if err != nil {
+					log.Errorf("updateHandler reload '%s' error: %s", s, err.Error())
+					RenderErrMsg(c, err.Error())
+					return
+				}
+				log.Infof("updateHandler reload '%s' success", s)
 			}
 			RenderSuccess(c, gin.H{
 				s: x,
