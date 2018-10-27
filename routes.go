@@ -14,6 +14,10 @@ func getInputType(f reflect.StructField) string {
 		return "switch"
 	case reflect.Slice:
 		return "list"
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return "number"
+	case reflect.Float32, reflect.Float64:
+		return "number"
 	default:
 		return "text"
 	}
@@ -113,13 +117,15 @@ func updateHandler(c *gin.Context) {
 	if cf, ok := cfgMap[s]; ok {
 		switch x := cf.(type) {
 		default:
-			err := c.BindQuery(x)
+			fmt.Println(x)
+			err := c.BindJSON(x)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error_msg": err.Error(),
 				})
 				return
 			}
+			fmt.Println(x)
 			err = Save()
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{

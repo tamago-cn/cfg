@@ -165,7 +165,7 @@ func Run() error {
 	router.GET("/cfg", indexHandler)
 	router.GET("/cfg/index", indexHandler)
 	router.GET("/cfg/list", confListHandler)
-	router.GET("/cfg/update/:section", updateHandler)
+	router.POST("/cfg/update/:section", updateHandler)
 
 	server = &http.Server{
 		Addr:           conf.Addr,
