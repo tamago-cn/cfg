@@ -8,6 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func webCommomHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		//c.Header("Content-Type", "application/json")
+	}
+}
+
 // ParserObjectFromReader 定义了解析参数到结构体的方法
 func ParserObjectFromReader(r io.Reader, obj interface{}) error {
 	decoder := json.NewDecoder(r)
@@ -16,12 +24,8 @@ func ParserObjectFromReader(r io.Reader, obj interface{}) error {
 
 // RenderSuccess 定义了返回成功的方法
 func RenderSuccess(c *gin.Context, data interface{}) {
-	//c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, gin.H{
-		"data":       data,
-		"error_msg":  "Succeed",
-		"error_code": "00",
-	})
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, data)
 }
 
 // RenderErrMsg 定义了返回错误信息的方法

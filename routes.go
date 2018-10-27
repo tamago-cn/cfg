@@ -8,37 +8,64 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Input 单个配置节点
-type Input struct {
-	Name    string      `json:"name"`
-	Type    string      `json:"type"`
-	Value   interface{} `json:"value"`
-	Comment string      `json:"comment"`
-}
-
-// Form 配置表单
-type Form struct {
-	Title  string   `json:"title"`
-	Inputs []*Input `json:"inputs"`
-}
-
 func getInputType(f reflect.StructField) string {
 	switch f.Type.Kind() {
 	case reflect.Bool:
-		return "checkbox"
+		return "switch"
+	case reflect.Slice:
+		return "list"
 	default:
 		return "text"
 	}
 }
 
 func getValue(v reflect.Value) interface{} {
-	return v.Interface()
+	switch v.Type().Kind() {
+	case reflect.Slice:
+		vs := []*ValueItem{
+			&ValueItem{
+				Type:  "text",
+				Value: "xxxx",
+			},
+		}
+		return vs
+	case reflect.Ptr:
+		// 指针
+		return v.Interface()
+	default:
+		return v.Interface()
+
+	}
 }
 
 func indexHandler(c *gin.Context) {
-	forms := make([]*Form, 0, len(sections))
+	c.HTML(http.StatusOK, "index.tmpl", gin.H{})
+}
+
+// Field 字段
+type Field struct {
+	Name    string      `json:"name"`
+	Type    string      `json:"type"`
+	Value   interface{} `json:"value"`
+	Comment string      `json:"comment"`
+}
+
+// ValueItem 当配置项为列表时使用单个Value使用此结构
+type ValueItem struct {
+	Type  string      `json:"type"`
+	Value interface{} `json:"value"`
+}
+
+// Section 配置节
+type Section struct {
+	Title  string   `json:"title"`
+	Fields []*Field `json:"fields"`
+}
+
+func confListHandler(c *gin.Context) {
+	confs := []*Section{}
 	for _, s := range sections {
-		inputs := []*Input{}
+		fields := []*Field{}
 		cf := cfgMap[s]
 		switch cs := cf.(type) {
 		default:
@@ -48,21 +75,19 @@ func indexHandler(c *gin.Context) {
 				ct = ct.Elem()
 				cv = cv.Elem()
 			} else {
-				c.JSON(http.StatusForbidden, gin.H{
-					"error_msg": "non-pointer struct",
-				})
+				RenderErrMsg(c, "non-pointer struct")
 				return
 			}
 
 			for i := 0; i < ct.NumField(); i++ {
 				f := ct.Field(i)
 				v := cv.Field(i)
-				name := f.Tag.Get("form")
+				name := f.Tag.Get("json")
 				if name == "" {
-					// 不绑定form的不展示在网页上
+					// 没有json标签的不支持在网页修改
 					continue
 				}
-				inputs = append(inputs, &Input{
+				fields = append(fields, &Field{
 					Name:    name,
 					Type:    getInputType(f),
 					Value:   getValue(v),
@@ -70,16 +95,16 @@ func indexHandler(c *gin.Context) {
 				})
 			}
 		}
-		if len(inputs) == 0 {
+		if len(fields) == 0 {
 			continue
 		}
-		form := &Form{
+		sec := &Section{
 			Title:  s,
-			Inputs: inputs,
+			Fields: fields,
 		}
-		forms = append(forms, form)
+		confs = append(confs, sec)
 	}
-	c.HTML(http.StatusOK, "index.tmpl", forms)
+	c.JSON(http.StatusOK, confs)
 }
 
 func updateHandler(c *gin.Context) {

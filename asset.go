@@ -9,16 +9,7 @@ import (
 	"github.com/tamago-cn/cfg/asset"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
-	"github.com/gin-gonic/gin"
 )
-
-func webCommomHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Headers", "Content-Type")
-		//c.Header("Content-Type", "application/json")
-	}
-}
 
 type binaryFS struct {
 	fs http.FileSystem
@@ -83,61 +74,3 @@ func pathExists(path string) bool {
 	}
 	return false
 }
-
-//// Reload 实现route的重载方法
-//func Reload() error {
-//	mutex.Lock()
-//	defer mutex.Unlock()
-//	Destroy()
-//	router = gin.Default()
-//
-//	router.Delims("{[", "]}")
-//
-//	if pathExists("static") {
-//		router.Static("/static", "static")
-//	} else {
-//		router.Use(static.Serve("/static", binaryFileSystem("static")))
-//	}
-//
-//	if pathExists("templates") {
-//		router.LoadHTMLGlob("templates/*")
-//	} else {
-//		tmpl, err := loadTemplate()
-//		if err != nil {
-//			return err
-//		}
-//		router.SetHTMLTemplate(tmpl)
-//	}
-//
-//	router.Use(webCommomHandler())
-//
-//	if middlewares != nil && len(middlewares) != 0 {
-//		for _, mid := range middlewares {
-//			router.Use(mid.middleware...)
-//			log.Infof("load middleware <%s>", mid.name)
-//		}
-//	}
-//
-//	if moduleList != nil {
-//		for _, module := range moduleList {
-//			for _, r := range module.routes {
-//				for _, m := range r.methods {
-//					m.register()
-//					log.Infof("load module router: %10s %-8s %s ", "<"+module.name+">", "["+m.name+"]", r.relativePath)
-//				}
-//			}
-//		}
-//	}
-//	return nil
-//}
-//
-//// Destroy 析构
-//func Destroy() error {
-//	router = nil
-//	return nil
-//}
-//
-//// Router 获取router
-//func Router() *gin.Engine {
-//	return router
-//}

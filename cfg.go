@@ -160,8 +160,11 @@ func Run() error {
 		router.SetHTMLTemplate(tmpl)
 	}
 
+	router.Use(webCommomHandler())
+
 	router.GET("/cfg", indexHandler)
 	router.GET("/cfg/index", indexHandler)
+	router.GET("/cfg/list", confListHandler)
 	router.GET("/cfg/update/:section", updateHandler)
 
 	server = &http.Server{
