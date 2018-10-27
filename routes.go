@@ -26,11 +26,13 @@ func getInputType(f reflect.StructField) string {
 func getValue(v reflect.Value) interface{} {
 	switch v.Type().Kind() {
 	case reflect.Slice:
-		vs := []*ValueItem{
-			&ValueItem{
+		fmt.Println(v.Len())
+		vs := make([]*ValueItem, 0, v.Len())
+		for i := 0; i < v.Len(); i++ {
+			vs = append(vs, &ValueItem{
 				Type:  "text",
-				Value: "xxxx",
-			},
+				Value: v.Index(i).Interface(),
+			})
 		}
 		return vs
 	case reflect.Ptr:
@@ -116,7 +118,6 @@ func updateHandler(c *gin.Context) {
 	if cf, ok := cfgMap[s]; ok {
 		switch x := cf.(type) {
 		default:
-			fmt.Println(x)
 			err := c.BindJSON(x)
 			if err != nil {
 				RenderErrMsg(c, err.Error())
