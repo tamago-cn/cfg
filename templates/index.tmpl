@@ -1,5 +1,6 @@
 <html>
-<head><title></title></head>
+<head><title>服务配置</title></head>
+<link rel="stylesheet" href="/cfg/static/css/bulma.css"></link>
 <body>
 {{ range . }}
 <form action="/cfg/update/{{ .Title }}" method="PUT" target="nm_iframe">
