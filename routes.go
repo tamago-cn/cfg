@@ -1,7 +1,6 @@
 package cfg
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
 
@@ -26,7 +25,6 @@ func getInputType(f reflect.StructField) string {
 func getValue(v reflect.Value) interface{} {
 	switch v.Type().Kind() {
 	case reflect.Slice:
-		fmt.Println(v.Len())
 		vs := make([]*ValueItem, 0, v.Len())
 		for i := 0; i < v.Len(); i++ {
 			vs = append(vs, &ValueItem{

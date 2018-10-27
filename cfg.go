@@ -24,6 +24,7 @@ func init() {
 		Addr:         "0.0.0.0:8086",
 		ReadTimeout:  10,
 		WriteTimeout: 10,
+		GinMode:      "debug",
 	}
 	RegistSection("cfg", conf, nil, nil)
 }
@@ -43,6 +44,7 @@ type Conf struct {
 	Addr         string        `ini:"addr" json:"addr"`
 	ReadTimeout  time.Duration `ini:"read_timeout" json:"read_timeout"`
 	WriteTimeout time.Duration `ini:"write_timeout" json:"write_timeout"`
+	GinMode      string        `ini:"gin_mode"`
 }
 
 //// Conf 配置
@@ -144,6 +146,7 @@ func Destroy() error {
 
 // Run 将配置暴露在网页上使其可修改
 func Run() error {
+	gin.SetMode(conf.GinMode)
 	router := gin.Default()
 
 	if pathExists("static") {
@@ -179,10 +182,10 @@ func Run() error {
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
-			log.Error("http server start error:", err)
+			log.Error("config interface start error:", err)
 		}
 	}()
-	log.Infof("http server listen on %s", conf.Addr)
+	log.Infof("config interface listen on %s", conf.Addr)
 	return nil
 }
 
