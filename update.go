@@ -10,16 +10,29 @@ import (
 
 // Input 单个配置节点
 type Input struct {
-	Name    string `json:"name"`
-	Type    string `json:"type"`
-	Value   string `json:"value"`
-	Comment string `json:"comment"`
+	Name    string      `json:"name"`
+	Type    string      `json:"type"`
+	Value   interface{} `json:"value"`
+	Comment string      `json:"comment"`
 }
 
 // Form 配置表单
 type Form struct {
 	Title  string   `json:"title"`
 	Inputs []*Input `json:"inputs"`
+}
+
+func getInputType(f reflect.StructField) string {
+	switch f.Type.Kind() {
+	case reflect.Bool:
+		return "checkbox"
+	default:
+		return "text"
+	}
+}
+
+func getValue(v reflect.Value) interface{} {
+	return v.Interface()
 }
 
 func indexHandler(c *gin.Context) {
@@ -48,8 +61,8 @@ func indexHandler(c *gin.Context) {
 				v := cv.Field(i)
 				inputs = append(inputs, &Input{
 					Name:    f.Tag.Get("form"),
-					Type:    f.Type.String(),
-					Value:   v.String(),
+					Type:    getInputType(f),
+					Value:   getValue(v),
 					Comment: f.Tag.Get("comment"),
 				})
 			}
@@ -63,35 +76,34 @@ func indexHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", forms)
 }
 
-type updateReq struct {
-	Section string                 `json:"section"`
-	Conf    map[string]interface{} `json:"conf"`
-}
-
 func updateHandler(c *gin.Context) {
 	s := c.Param("section")
 	fmt.Println(s)
-	//req := &updateReq{}
-	//err := c.BindJSON(req)
-	//req := map[string]interface{}{}
-	//err := c.BindQuery(&req)
-	//if err != nil {
-	//	c.JSON(http.StatusBadRequest, gin.H{
-	//		"error_msg": err.Error(),
-	//	})
-	//	return
-	//}
-	//fmt.Println(req)
-	c.JSON(http.StatusOK, gin.H{})
-	//if s, ok := cfgMap[req.Section]; ok {
-	//	// TODO: 更新配置
-	//	//for k, v := range req.Conf {
-	//	//	fmt.Println(s, k, v)
-	//	//}
-	//	c.JSON(http.StatusOK, gin.H{})
-	//	return
-	//}
-	//c.JSON(http.StatusBadRequest, gin.H{
-	//	"error_msg": fmt.Sprintf("unsupported section: '%s'", req.Section),
-	//})
+	if cf, ok := cfgMap[s]; ok {
+		switch x := cf.(type) {
+		default:
+			err := c.BindQuery(x)
+			fmt.Println(err)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error_msg": err.Error(),
+				})
+				return
+			}
+			err = Save()
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error_msg": err.Error(),
+				})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{
+				s: x,
+			})
+			return
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"error_msg": "unsupported section",
+	})
 }
